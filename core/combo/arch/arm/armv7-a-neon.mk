@@ -7,4 +7,4 @@ ARCH_ARM_HAVE_VFP_D32           := true
 ARCH_ARM_HAVE_NEON              := true
 arch_variant_cflags += \
     -mfloat-abi=softfp \
-    -mfpu=neon
+    -mfpu=neon-fp-armv8
