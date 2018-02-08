@@ -92,4 +92,12 @@ $(subst $(space),, \
 )
 endef
 
+ifeq ($(LOCAL_ARM_MODE),arm)
+   my_target_global_cflags += -marm
+   my_target_global_cppflags += -marm
+ else ifeq ($(LOCAL_ARM_MODE),thumb)
+   my_target_global_cflags += -mthumb
+   my_target_global_cppflags += -mthumb
+endif
+
 include $(BUILD_SYSTEM)/clang/tidy.mk
