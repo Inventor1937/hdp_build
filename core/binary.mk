@@ -384,8 +384,6 @@ ifeq ($(my_clang),false)
     endif
 endif
 
-my_sdclang := $(strip $(LOCAL_SDCLANG))
-
 # clang is enabled by default for host builds
 # enable it unless we've specifically disabled clang above
 ifdef LOCAL_IS_HOST_MODULE
@@ -406,6 +404,21 @@ else ifeq ($(USE_CLANG_PLATFORM_BUILD),false)
     endif
 else ifeq ($(my_clang),)
     my_clang := true
+endif
+
+my_sdclang := $(strip $(LOCAL_SDCLANG))
+my_sdclang_2 := $(strip $(LOCAL_SDCLANG_2))
+ifeq ($(my_sdclang),true)
+    ifeq ($(my_sdclang_2),true)
+        $(error LOCAL_SDCLANG and LOCAL_SDCLANG_2 can not be set to true at the same time!)
+    endif
+endif
+ifeq ($(SDCLANG),true)
+    ifeq ($(my_sdclang),)
+        ifneq ($(my_sdclang_2),true)
+            my_sdclang := true
+        endif
+    endif
 endif
 
 ifeq ($(LOCAL_C_STD),)
@@ -452,14 +465,6 @@ endif
 
 ifneq (,$(my_cpp_std_version))
    my_cpp_std_cppflags := -std=$(my_cpp_std_version)
-endif
-
-ifeq ($(SDCLANG),true)
-    ifeq ($(my_sdclang),)
-        ifeq ($(TARGET_USE_SDCLANG),true)
-            my_sdclang := true
-        endif
-    endif
 endif
 
 # arch-specific static libraries go first so that generic ones can depend on them
@@ -575,30 +580,40 @@ my_target_global_cflags := $($(LOCAL_2ND_ARCH_VAR_PREFIX)CLANG_$(my_prefix)GLOBA
 my_target_global_conlyflags := $($(LOCAL_2ND_ARCH_VAR_PREFIX)CLANG_$(my_prefix)GLOBAL_CONLYFLAGS) $(my_c_std_conlyflags)
 my_target_global_cppflags := $($(LOCAL_2ND_ARCH_VAR_PREFIX)CLANG_$(my_prefix)GLOBAL_CPPFLAGS) $(my_cpp_std_cppflags)
 my_target_global_ldflags := $($(LOCAL_2ND_ARCH_VAR_PREFIX)CLANG_$(my_prefix)GLOBAL_LDFLAGS)
-    ifeq ($(my_sdclang),true)
-        SDCLANG_PRECONFIGURED_FLAGS := -O3 -march=armv8-a -mcpu=cortex-a53 -mfpu=crypto-neon-fp-armv8 -ffp-contract=on -mllvm -polly
+ifeq ($(my_sdclang),true) 
+        SDCLANG_PRECONFIGURED_FLAGS := -O3 -march=armv8-a+crc -mcpu=cortex-a53 -mfpu=crypto-neon-fp-armv8 -ffp-contract=fast -mllvm -polly 
+ 
+        ifeq ($(LOCAL_SDCLANG_LTO), true) 
++
+            ifneq ($(LOCAL_MODULE_CLASS), STATIC_LIBRARIES) 
+                SDCLANG_PRECONFIGURED_FLAGS += -fuse-ld=qcld -flto 
+            endif 
+        endif 
 
-        ifeq ($(LOCAL_SDCLANG_LTO), true)
-            ifneq ($(LOCAL_MODULE_CLASS), STATIC_LIBRARIES)
-                SDCLANG_PRECONFIGURED_FLAGS += -fuse-ld=qcld -flto
-            endif
-        endif
+        # Bundle our setup and add it to cflags 
+        my_target_global_cflags += $(SDCLANG_COMMON_FLAGS) $(SDCLANG_PRECONFIGURED_FLAGS) 
+ 
+        # Pass all cflags and module specific LTO flags to linker 
+        my_target_global_ldflags += $(my_target_global_cflags) $(LOCAL_SDCLANG_LTO_LDFLAGS) 
 
-        # Bundle our setup and add it to cflags
-        my_target_global_cflags += $(SDCLANG_COMMON_FLAGS) $(SDCLANG_PRECONFIGURED_FLAGS)
+endif
 
-        # Pass all cflags and module specific LTO flags to linker
-        my_target_global_ldflags += $(my_target_global_cflags) $(LOCAL_SDCLANG_LTO_LDFLAGS)
-
-        SDCLANG_PRECONFIGURED_FLAGS :=
-
-        ifeq ($(strip $(my_cc)),)
-            my_cc := $(my_cc_wrapper) $(SDCLANG_PATH)/clang
-        endif
-        ifeq ($(strip $(my_cxx)),)
-            my_cxx := $(my_cxx_wrapper) $(SDCLANG_PATH)/clang++
-        endif
+ifeq ($(my_sdclang),true)
+    ifeq ($(strip $(my_cc)),)
+        my_cc := $(SDCLANG_PATH)/clang
     endif
+    ifeq ($(strip $(my_cxx)),)
+        my_cxx := $(SDCLANG_PATH)/clang++
+    endif
+endif
+ifeq ($(my_sdclang_2),true)
+    ifeq ($(strip $(my_cc)),)
+        my_cc := $(SDCLANG_PATH_2)/clang
+    endif
+    ifeq ($(strip $(my_cxx)),)
+        my_cxx := $(SDCLANG_PATH_2)/clang++
+    endif
+endif
 else
 my_target_global_cflags := $($(LOCAL_2ND_ARCH_VAR_PREFIX)$(my_prefix)GLOBAL_CFLAGS)
 my_target_global_conlyflags := $($(LOCAL_2ND_ARCH_VAR_PREFIX)$(my_prefix)GLOBAL_CONLYFLAGS) $(my_c_std_conlyflags)
