@@ -70,8 +70,8 @@ PRODUCT_DEFAULT_PROPERTY_OVERRIDES += \
 # make "boot" reasons only extract for faster turnaround.
 
 PRODUCT_DEFAULT_PROPERTY_OVERRIDES += \
-    pm.dexopt.first-boot=extract \
-    pm.dexopt.boot=extract \
+    pm.dexopt.first-boot=quicken \
+    pm.dexopt.boot=verify \
     pm.dexopt.install=quicken \
     pm.dexopt.bg-dexopt=speed \
     pm.dexopt.ab-ota=speed \
