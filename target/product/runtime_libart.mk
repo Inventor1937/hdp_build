@@ -56,7 +56,7 @@ PRODUCT_PACKAGES += art-tools
 PRODUCT_PACKAGES += \
     cacerts \
 
-PRODUCT_DEFAULT_PROPERTY_OVERRIDES += \
+PRODUCT_SYSTEM_DEFAULT_PROPERTIES += \
     dalvik.vm.image-dex2oat-Xms=64m \
     dalvik.vm.image-dex2oat-Xmx=64m \
     dalvik.vm.dex2oat-Xms=64m \
@@ -68,11 +68,19 @@ PRODUCT_DEFAULT_PROPERTY_OVERRIDES += \
     dalvik.vm.appimageformat=lz4 \
     dalvik.vm.gctype=GSS
 
-# make "boot" reasons only extract for faster turnaround.
+# Different dexopt types for different package update/install times.
+# On eng builds, make "boot" reasons only extract for faster turnaround.
+ifeq (eng,$(TARGET_BUILD_VARIANT))
+    PRODUCT_SYSTEM_DEFAULT_PROPERTIES += \
+        pm.dexopt.first-boot=extract \
+        pm.dexopt.boot=extract
+else
+    PRODUCT_SYSTEM_DEFAULT_PROPERTIES += \
+        pm.dexopt.first-boot=quicken \
+        pm.dexopt.boot=verify
+endif
 
-PRODUCT_DEFAULT_PROPERTY_OVERRIDES += \
-    pm.dexopt.first-boot=quicken \
-    pm.dexopt.boot=verify \
+PRODUCT_SYSTEM_DEFAULT_PROPERTIES += \
     pm.dexopt.install=quicken \
     pm.dexopt.bg-dexopt=speed \
     pm.dexopt.ab-ota=speed \
