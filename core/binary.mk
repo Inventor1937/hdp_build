@@ -585,8 +585,8 @@ my_target_global_ldflags := $($(LOCAL_2ND_ARCH_VAR_PREFIX)CLANG_$(my_prefix)GLOB
 ifeq ($(my_sdclang),true) 
         SDCLANG_PRECONFIGURED_FLAGS := -O3 -g0 -mcpu=cortex-a53 \
 -ffp-contract=fast -fno-align-functions -fno-align-labels -fno-align-loops \
--fno-align-os -munaligned-access \
--mllvm -polly -mllvm -polly-vectorizer=neon -mllvm -favor-r0-7
+-fno-align-os -mllvm -polly -mllvm -polly-vectorizer=neon \
+-mllvm -polly-process-unprofitable
  
         ifeq ($(LOCAL_SDCLANG_LTO), true) 
             ifneq ($(LOCAL_MODULE_CLASS), STATIC_LIBRARIES) 
