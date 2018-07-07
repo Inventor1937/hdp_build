@@ -662,7 +662,7 @@ function lunch()
     export SDCLANG_PATH_2=$(gettop)/vendor/qcom/sdclang/bin
     export SDCLANG_LTO_DEFS=$(gettop)/vendor/omni/sdclang/sdllvm-lto-defs.mk
     export SDCLANG_CONFIG="$(gettop)/vendor/qcom/sdclang/sdclang.json"
-    export SDCLANG_AE_CONFIG="$(gettop)/vendor/qcom/sdclang/sdclang.json"
+    export SDCLANG_AE_CONFIG="$(gettop)/vendor/qcom/sdclang/sdclangAE.json"
     echo
 
     fixup_common_out_dir
