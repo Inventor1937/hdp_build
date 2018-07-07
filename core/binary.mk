@@ -583,7 +583,7 @@ my_target_global_conlyflags := $($(LOCAL_2ND_ARCH_VAR_PREFIX)CLANG_$(my_prefix)G
 my_target_global_cppflags := $($(LOCAL_2ND_ARCH_VAR_PREFIX)CLANG_$(my_prefix)GLOBAL_CPPFLAGS) $(my_cpp_std_cppflags)
 my_target_global_ldflags := $($(LOCAL_2ND_ARCH_VAR_PREFIX)CLANG_$(my_prefix)GLOBAL_LDFLAGS)
 ifeq ($(my_sdclang),true) 
-        SDCLANG_PRECONFIGURED_FLAGS := -O3 -g0 -mcpu=cortex-a57 \
+        SDCLANG_PRECONFIGURED_FLAGS := -O3 -g0 -mcpu=cortex-a53 \
 -ffp-contract=fast -fno-align-functions -fno-align-labels -fno-align-loops \
 -fno-align-os -munaligned-access \
 -mllvm -polly -mllvm -polly-vectorizer=neon -mllvm -favor-r0-7
